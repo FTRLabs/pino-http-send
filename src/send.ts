@@ -1,4 +1,4 @@
-import got, { Method } from 'got';
+import axios, { Method } from 'axios';
 
 import { args } from './args';
 import { logError, logWarn } from './log';
@@ -32,7 +32,7 @@ export function createBody(
 export function send(logs: Record<string, unknown>[], numRetries = 0): void {
   const {
     url,
-    method,
+    method = 'POST',
     username,
     password,
     headers = {},
@@ -44,13 +44,18 @@ export function send(logs: Record<string, unknown>[], numRetries = 0): void {
 
   const limitHit = numRetries === retries;
 
+  const auth =
+    username && password
+      ? {
+          username,
+          password,
+        }
+      : undefined;
   // fire and forget so we don't await or anything
-  got(url, {
+  axios(url, {
     method: method as Method,
-    username,
-    password,
+    auth,
     headers,
-    allowGetBody: true,
     ...createBody(logs, bodyType as BodyType),
   })
     .then()

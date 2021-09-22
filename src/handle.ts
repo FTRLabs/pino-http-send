@@ -34,7 +34,7 @@ export function handleLog(
 
     callback?.();
   } else {
-    timeoutId = setTimeout(sendAndClear, args.timeout);
+    timeoutId = setTimeout(sendAndClear, args.timeout) as unknown as number;
 
     callback?.();
   }
