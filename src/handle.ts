@@ -4,7 +4,7 @@ import { args } from './args';
 import { send } from './send';
 
 let batch: Record<string, unknown>[] = [];
-let timeoutId: number;
+let timeoutId: NodeJS.Timeout | number;
 
 /**
  * Sends the batch and then clears it.
@@ -25,7 +25,11 @@ export function handleLog(
   log: Record<string, unknown>,
   callback?: TransformCallback,
 ): void {
-  clearTimeout(timeoutId);
+  if (window) {
+    window.clearTimeout(timeoutId as number);
+  } else {
+    clearTimeout(timeoutId as NodeJS.Timeout);
+  }
 
   batch.push(log);
 
@@ -34,7 +38,7 @@ export function handleLog(
 
     callback?.();
   } else {
-    timeoutId = setTimeout(sendAndClear, args.timeout) as unknown as number;
+    timeoutId = setTimeout(sendAndClear, args.timeout);
 
     callback?.();
   }
